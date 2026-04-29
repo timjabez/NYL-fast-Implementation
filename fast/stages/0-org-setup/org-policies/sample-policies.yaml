@@ -1,5 +1,0 @@
-# New Sample Organization Policies for Testing
-
-compute.disableGuestAttributesAccess:
-  rules:
-    - enforce: true

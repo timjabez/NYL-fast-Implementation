@@ -1,65 +1,106 @@
-module "org-policies" {
-  source          = "../../../modules/organization"
-  organization_id = var.organization_id
+/**
+ * Copyright 2025 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-  factories_config = {
-    # Path to the folder where you will put your policy YAML files
-    org_policies = var.org_policies_path
+locals {
+  _ctx = {
+    for k, v in var.context : k => merge(
+      v,
+      try(local._defaults.context[k], {})
+    )
   }
-
-  iam_bindings_additive = {
-    seed_sa_project_creator = {
-      member = module.seed_sa.iam_email
-      role   = "roles/resourcemanager.projectCreator"
+  # fail if we have no valid defaults
+  _defaults = yamldecode(file(local.paths.defaults))
+  ctx = merge(local._ctx, {
+    iam_principals = merge(local.iam_principals, local._ctx.iam_principals)
+  })
+  defaults = {
+    billing_account = try(local._defaults.global.billing_account, null)
+    observability   = try(local._defaults.observability, null)
+    organization = (
+      try(local._defaults.global.organization.id, null) == null
+      ? null
+      : local._defaults.global.organization
+    )
+    prefix = try(
+      local.project_defaults.defaults.prefix,
+      local.project_defaults.overrides.prefix,
+      null
+    )
+  }
+  iam_principals = merge(
+    local.org_iam_principals,
+    var.context.iam_principals,
+    try(local._defaults.context.iam_principals, {})
+  )
+  output_files = {
+    local_path     = try(local._defaults.output_files.local_path, null)
+    storage_bucket = try(local._defaults.output_files.storage_bucket, null)
+    providers      = try(local._defaults.output_files.providers, {})
+  }
+  paths = {
+    for k, v in var.factories_config.paths : k => try(pathexpand(
+      startswith(v, "/") || startswith(v, ".")
+      ? v :
+      "${var.factories_config.dataset}/${v}"
+    ), null)
+  }
+  project_defaults = {
+    defaults  = try(local._defaults.projects.defaults, {})
+    overrides = try(local._defaults.projects.overrides, {})
+  }
+  vpc_defaults = {
+    defaults  = try(local._defaults.vpcs.defaults, {})
+    overrides = try(local._defaults.vpcs.overrides, {})
+  }
+  workload_identity_pools = merge([
+    for k, v in module.factory.projects : {
+      for wk, wv in v.workload_identity_pools :
+      "${k}/${wk}" => wv
     }
-    seed_sa_folder_creator = {
-      member = module.seed_sa.iam_email
-      role   = "roles/resourcemanager.folderCreator"
+  ]...)
+  workload_identity_providers = merge([
+    for k, v in module.factory.projects : {
+      for wk, wv in v.workload_identity_providers :
+      "${k}/${wk}" => wv.name
+    }
+  ]...)
+}
+
+# TODO: streamine location replacements
+
+resource "terraform_data" "precondition" {
+  lifecycle {
+    precondition {
+      condition     = try(local.defaults.billing_account, null) != null
+      error_message = "No billing account set in global defaults."
+    }
+    precondition {
+      condition = (
+        local.organization_id != null ||
+        try(local.project_defaults.defaults.parent, null) != null ||
+        try(local.project_defaults.overrides.parent, null) != null
+      )
+      error_message = "Project parent must be set in project defaults or overrides if no organization id is set."
+    }
+    precondition {
+      condition = (
+        try(local.project_defaults.defaults.prefix, null) != null ||
+        try(local.project_defaults.overrides.prefix, null) != null
+      )
+      error_message = "Prefix must be set in project defaults or overrides."
     }
   }
-}
-
-module "folder_bootstrap" {
-  source = "../../../modules/folder"
-  parent = var.organization_id
-  name   = "Bootstrap"
-}
-
-module "project_seed" {
-  source          = "../../../modules/project"
-  parent          = module.folder_bootstrap.id
-  name            = "prj-b-seed-v2"
-  prefix          = "nyl"
-  billing_account = var.billing_account
-  services = [
-    "cloudresourcemanager.googleapis.com",
-    "iam.googleapis.com",
-    "cloudbilling.googleapis.com",
-    "serviceusage.googleapis.com"
-  ]
-}
-
-module "seed_sa" {
-  source       = "../../../modules/iam-service-account"
-  project_id   = module.project_seed.project_id
-  name         = "project-factory"
-  display_name = "Seed Project Factory Service Account"
-}
-
-module "folder_common" {
-  source = "../../../modules/folder"
-  parent = var.organization_id
-  name   = "Common"
-}
-
-module "project_logging" {
-  source          = "../../../modules/project"
-  parent          = module.folder_common.id
-  name            = "prj-c-log-v2"
-  prefix          = "nyl"
-  billing_account = var.billing_account
-  services = [
-    "logging.googleapis.com",
-    "bigquery.googleapis.com"
-  ]
 }
