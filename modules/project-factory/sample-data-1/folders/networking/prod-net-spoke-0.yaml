@@ -1,4 +1,4 @@
-# Copyright 2024 Google LLC
+# Copyright 2025 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,17 +14,19 @@
 
 # yaml-language-server: $schema=../../../schemas/project.schema.json
 
-parent: $folder_ids:team-a/prod
+iam_bindings_additive:
+  vm_default_logging:
+    member: "$iam_principals:service_accounts/prod-net-spoke-0/vm-default"
+    role: roles/logging.logWriter
+  vm_default_monitoring:
+    member: "$iam_principals:service_accounts/prod-net-spoke-0/vm-default"
+    role: roles/monitoring.metricWriter
+service_accounts:
+  vm-default:
+    display_name: VM default service account.
 services:
   - compute.googleapis.com
-shared_vpc_service_config:
-  host_project: $project_ids:net-prod-0
-  # network_users:
-  #   - group:team-a-admins@example.com
-# iam:
-#   # reset default role on new project
-#   roles/owner: []
-# log_buckets:
-#   _Default:
-#     retention: 90
-#     location: europe-west1
+  - logging.googleapis.com
+  - monitoring.googleapis.com
+shared_vpc_host_config:
+  enabled: true

@@ -20,7 +20,8 @@ variable "automation" {
   type = object({
     outputs_bucket = string
   })
-  nullable = false
+  nullable = true
+  default  = null
 }
 
 variable "billing_account" {

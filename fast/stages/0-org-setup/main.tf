@@ -17,6 +17,7 @@ module "org-policies" {
       role   = "roles/resourcemanager.folderCreator"
     }
   }
+}
 
 module "folder_bootstrap" {
   source = "../../../modules/folder"
