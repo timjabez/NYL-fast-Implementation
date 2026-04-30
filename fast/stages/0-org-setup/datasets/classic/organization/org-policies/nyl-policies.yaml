@@ -1,0 +1,89 @@
+run.allowedIngress:
+  rules:
+  - allow:
+      values:
+      - is:internal-and-cloud-load-balancing
+
+cloudfunctions.restrictAllowedGenerations:
+  rules:
+  - allow:
+      values:
+      - is:2ndGen
+
+sql.restrictPublicIp:
+  rules:
+  - enforce: true
+
+storage.publicAccessPrevention:
+  rules:
+  - enforce: true
+
+storage.secureHttpTransport:
+  rules:
+  - enforce: true
+
+compute.vmExternalIpAccess:
+  rules:
+  - deny:
+      all: true
+
+compute.disableAllIpv6:
+  rules:
+  - enforce: true
+
+compute.disableInternetNetworkEndpointGroup:
+  rules:
+  - enforce: true
+
+compute.disablePrivateServiceConnectCreationForConsumers:
+  rules:
+  - deny:
+      all: true
+
+compute.requireVpcFlowLogs:
+  rules:
+  - allow:
+      values:
+      - is:LIGHT
+
+compute.restrictCloudNATUsage:
+  rules:
+  - deny:
+      all: true
+
+compute.restrictLoadBalancerCreationForTypes:
+  rules:
+  - allow:
+      values:
+      - in:INTERNAL
+
+commerceorggovernance.disablePublicMarketplace:
+  rules:
+  - enforce: true
+
+container.managed.disableInsecureKubeletReadOnlyPort:
+  rules:
+  - enforce: true
+
+container.managed.enableCloudLogging:
+  rules:
+  - enforce: true
+
+iam.managed.preventPrivilegedBasicRolesForDefaultServiceAccounts:
+  rules:
+  - enforce: true
+
+iam.disableAuditLoggingExemption:
+  rules:
+  - enforce: true
+
+
+gcp.resourceLocations:
+  rules:
+  - allow:
+      values:
+      - in:us-locations
+
+ainotebooks.restrictPublicIp:
+  rules:
+  - enforce: true

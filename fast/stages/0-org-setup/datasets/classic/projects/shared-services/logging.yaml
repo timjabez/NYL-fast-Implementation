@@ -1,10 +1,9 @@
-# yaml-language-server: $schema=../../../../schemas/project.schema.json
-parent: $folder_ids:observability
-name: prod-audit-logs-0
+parent: $folder_ids:shared-services
+name: logging
 iam_by_principals:
-  $iam_principals:service_accounts/iac-0/iac-org-ro:
+  $iam_principals:service_accounts/seed/iac-org-ro:
     - roles/viewer
-  $iam_principals:service_accounts/iac-0/iac-org-rw:
+  $iam_principals:service_accounts/seed/iac-org-rw:
     - roles/owner
 services:
   - logging.googleapis.com
@@ -15,6 +14,7 @@ services:
 log_buckets:
   audit-logs: {}
   iam: {}
+  environment-logs: {}
   vpc-sc:
     log_analytics:
       enable: true
@@ -26,7 +26,10 @@ pubsub_topics:
   splunk-export-topic:
     labels:
       env: prod
+  env-logs-topic:
+    labels:
+      env: prod
 datasets:
   audit_logs_dataset:
     friendly_name: "Centralized Audit Logs Dataset"
-    location: EU
+    location: us-east4

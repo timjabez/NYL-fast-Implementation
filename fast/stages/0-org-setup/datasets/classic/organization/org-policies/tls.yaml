@@ -1,0 +1,6 @@
+gcp.restrictTLSVersion:
+  rules:
+  - deny:
+      values:
+      - is:TLS_VERSION_1
+      - is:TLS_VERSION_1_1
