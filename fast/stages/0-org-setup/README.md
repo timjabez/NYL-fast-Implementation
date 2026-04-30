@@ -928,3 +928,26 @@ Define values for the `var.environments` variable in a tfvars file.
 | [tfvars](outputs.tf#L41) | Stage tfvars. | ✓ |
 | [vpc_self_links](outputs.tf#L47) | Map of VPC self links keyed by VPC name. |  |
 <!-- END TFDOC -->
+
+## Custom Configurations and Version Control
+
+To prevent sensitive organization details (like Organization ID, Billing ID, Quota Project, and Domain Names) from being pushed to version control, certain configuration files have been added to `.gitignore`.
+
+For new environments or colleagues setting up this code in their own organizations, `.example` templates have been provided:
+
+1. `datasets/classic/defaults.yaml.example`
+2. `datasets/classic/organization/.config.yaml.example`
+3. `terraform.tfvars.example`
+4. `provider.tf.example`
+
+**Steps to configure for a new organization:**
+1. Copy the `.example` files to their actual filenames (removing the `.example` extension).
+   ```bash
+   cp datasets/classic/defaults.yaml.example datasets/classic/defaults.yaml
+   cp datasets/classic/organization/.config.yaml.example datasets/classic/organization/.config.yaml
+   cp terraform.tfvars.example terraform.tfvars
+   cp provider.tf.example provider.tf
+   ```
+2. Replace all placeholder values (`<YOUR_ORG_ID>`, `<YOUR_BILLING_ID>`, `<YOUR_DOMAIN_NAME>`, `<YOUR_CUSTOMER_ID>`, `<YOUR_QUOTA_PROJECT_ID>`) in those files with your actual Google Cloud values.
+3. Review `datasets/classic/billing-accounts/default.yaml` and uncomment the `iam_bindings_additive` if you have permissions to manage IAM on your external billing account.
+4. Run `terraform init` and `terraform apply`.

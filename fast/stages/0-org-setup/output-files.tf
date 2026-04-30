@@ -58,15 +58,7 @@ locals {
       )
     )
   }
-  of_outputs_bucket = (
-    local.output_files.storage_bucket == null
-    ? null
-    : lookup(
-      local.of_buckets,
-      local.output_files.storage_bucket,
-      local.output_files.storage_bucket
-    )
-  )
+  of_outputs_bucket = null
   of_service_accounts = {
     for k, v in module.factory.service_account_emails :
     "$iam_principals:service_accounts/${k}" => v
@@ -119,16 +111,7 @@ locals {
       project_numbers  = module.factory.project_numbers
       service_accounts = module.factory.service_account_emails
       storage_buckets  = module.factory.storage_buckets
-      subnet_ips = {
-        for k, v in module.vpcs.vpcs : k => v.subnet_ips
-      }
-      subnet_self_links = {
-        for k, v in module.vpcs.vpcs : k => v.subnet_ids
-      }
       tag_values = local.of_ctx.tag_values
-      vpc_self_links = {
-        for k, v in module.vpcs.vpcs : k => v.id
-      }
       workload_identity_providers  = local.workload_identity_providers
       workforce_identity_providers = module.organization[0].workforce_identity_providers
     }
@@ -147,14 +130,6 @@ resource "local_file" "providers" {
   content         = local.of_providers_content[each.key]
 }
 
-resource "google_storage_bucket_object" "providers" {
-  for_each       = local.output_files.storage_bucket == null ? {} : local.output_files.providers
-  bucket         = local.of_outputs_bucket
-  name           = "providers/${each.key}-providers.tf"
-  content        = local.of_providers_content[each.key]
-  source_md5hash = md5(local.of_providers_content[each.key])
-}
-
 resource "local_file" "tfvars" {
   for_each        = toset(local.of_path == null ? [] : keys(local.of_tfvars))
   file_permission = "0644"
@@ -162,21 +137,3 @@ resource "local_file" "tfvars" {
   content         = jsonencode(local.of_tfvars[each.key])
 }
 
-resource "google_storage_bucket_object" "tfvars" {
-  for_each       = toset(local.output_files.storage_bucket == null ? [] : keys(local.of_tfvars))
-  bucket         = local.of_outputs_bucket
-  name           = "tfvars/0-${each.key}.auto.tfvars.json"
-  content        = jsonencode(local.of_tfvars[each.key])
-  source_md5hash = md5(jsonencode(local.of_tfvars[each.key]))
-}
-
-resource "google_storage_bucket_object" "version" {
-  count = (
-    local.output_files.storage_bucket != null &&
-    fileexists("fast_version.txt") ? 1 : 0
-  )
-  bucket         = local.of_outputs_bucket
-  name           = "versions/0-org-setup-version.txt"
-  source         = "fast_version.txt"
-  source_md5hash = filemd5("fast_version.txt")
-}

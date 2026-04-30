@@ -39,6 +39,16 @@ iam_bindings:
       title: Project factory org policy viewer
 # authoritative IAM bindings by principal
 iam_by_principals:
+  "user:admin@<YOUR_DOMAIN_NAME>":
+    - roles/billing.admin
+    - roles/logging.admin
+    - roles/iam.organizationRoleAdmin
+    - roles/orgpolicy.policyAdmin
+    - roles/resourcemanager.folderAdmin
+    - roles/resourcemanager.organizationAdmin
+    - roles/resourcemanager.projectCreator
+    - roles/resourcemanager.tagAdmin
+    - roles/owner
   $iam_principals:gcp-organization-admins:
     - roles/cloudasset.owner
     - roles/cloudsupport.admin
@@ -79,16 +89,7 @@ iam_by_principals:
     - roles/serviceusage.serviceUsageViewer
     - $custom_roles:organization_admin_viewer
     - $custom_roles:tag_viewer
-  $iam_principals:service_accounts/iac-0/iac-networking-rw:
-    # uncomment for cooperative VPC-SC configurations
-    # - roles/accesscontextmanager.policyEditor
-    - roles/compute.orgFirewallPolicyAdmin
-    - roles/compute.xpnAdmin
-  $iam_principals:service_accounts/iac-0/iac-networking-ro:
-    # uncomment for cooperative VPC-SC configurations
-    # - roles/accesscontextmanager.policyReader
-    - roles/compute.orgFirewallPolicyUser
-    - roles/compute.viewer
+
   # uncomment for cooperative VPC-SC configurations
   # $iam_principals:service_accounts/iac-0/iac-pf-rw:
   #   - roles/accesscontextmanager.policyEditor
@@ -116,26 +117,30 @@ data_access_logs:
   sts.googleapis.com:
     ADMIN_READ: {}
 logging:
-  # disable_default_log_sink: false
-  storage_location: $locations:primary
   sinks:
     audit-logs:
-      # description: foo
-      # exclusions: {}
-      destination: $log_buckets:log-0/audit-logs
+      destination: $log_buckets:prj-audit-logs/audit-logs
+      filter: |
+        log_id("cloudaudit.googleapis.com/activity") OR
+        log_id("cloudaudit.googleapis.com/system_event") OR
+        log_id("cloudaudit.googleapis.com/policy") OR
+        log_id("cloudaudit.googleapis.com/access_transparency")
+    splunk-export:
+      type: pubsub
+      destination: $pubsub_topics:prj-audit-logs/splunk-export-topic
       filter: |
         log_id("cloudaudit.googleapis.com/activity") OR
         log_id("cloudaudit.googleapis.com/system_event") OR
         log_id("cloudaudit.googleapis.com/policy") OR
         log_id("cloudaudit.googleapis.com/access_transparency")
     iam:
-      destination: $log_buckets:log-0/iam
+      destination: $log_buckets:prj-audit-logs/iam
       filter: |
         protoPayload.serviceName="iamcredentials.googleapis.com" OR
         protoPayload.serviceName="iam.googleapis.com" OR
         protoPayload.serviceName="sts.googleapis.com"
     vpc-sc:
-      destination: $log_buckets:log-0/vpc-sc
+      destination: $log_buckets:prj-audit-logs/vpc-sc
       filter: |
         protoPayload.metadata.@type="type.googleapis.com/google.cloud.audit.VpcServiceControlAuditMetadata"
 # authoritative IAM bindings by role

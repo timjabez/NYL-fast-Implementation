@@ -47,7 +47,6 @@ locals {
   )
   output_files = {
     local_path     = try(local._defaults.output_files.local_path, null)
-    storage_bucket = try(local._defaults.output_files.storage_bucket, null)
     providers      = try(local._defaults.output_files.providers, {})
   }
   paths = {
@@ -60,10 +59,6 @@ locals {
   project_defaults = {
     defaults  = try(local._defaults.projects.defaults, {})
     overrides = try(local._defaults.projects.overrides, {})
-  }
-  vpc_defaults = {
-    defaults  = try(local._defaults.vpcs.defaults, {})
-    overrides = try(local._defaults.vpcs.overrides, {})
   }
   workload_identity_pools = merge([
     for k, v in module.factory.projects : {

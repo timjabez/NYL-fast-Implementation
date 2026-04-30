@@ -1,0 +1,23 @@
+# yaml-language-server: $schema=../../../../schemas/project.schema.json
+parent: $folder_ids:observability
+name: prod-env-logs-0
+iam_by_principals:
+  $iam_principals:service_accounts/iac-0/iac-org-ro:
+    - roles/viewer
+  $iam_principals:service_accounts/iac-0/iac-org-rw:
+    - roles/owner
+services:
+  - logging.googleapis.com
+  - pubsub.googleapis.com
+  - bigquery.googleapis.com
+  - storage.googleapis.com
+log_buckets:
+  environment-logs: {}
+pubsub_topics:
+  env-logs-topic:
+    labels:
+      env: prod
+datasets:
+  env_logs_dataset:
+    friendly_name: "Environment Logs Dataset"
+    location: EU
