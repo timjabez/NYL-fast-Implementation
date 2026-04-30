@@ -32,3 +32,8 @@ node_modules
 fast/**/globals.auto.tfvars.json
 cloud_sql_proxy
 env/
+
+# FAST Custom Config Overrides
+fast/stages/0-org-setup/datasets/classic/defaults.yaml
+fast/stages/0-org-setup/datasets/classic/organization/.config.yaml
+fast/stages/0-org-setup/provider.tf
