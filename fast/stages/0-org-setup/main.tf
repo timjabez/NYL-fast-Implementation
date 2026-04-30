@@ -27,7 +27,7 @@ locals {
     iam_principals = merge(local.iam_principals, local._ctx.iam_principals)
   })
   defaults = {
-    billing_account = try(local._defaults.global.billing_account, null)
+    billing_account = try(data.google_billing_account.default[0].id, local._defaults.global.billing_account, null)
     observability   = try(local._defaults.observability, null)
     organization = (
       try(local._defaults.global.organization.id, null) == null
@@ -46,8 +46,8 @@ locals {
     try(local._defaults.context.iam_principals, {})
   )
   output_files = {
-    local_path     = try(local._defaults.output_files.local_path, null)
-    providers      = try(local._defaults.output_files.providers, {})
+    local_path = try(local._defaults.output_files.local_path, null)
+    providers  = try(local._defaults.output_files.providers, {})
   }
   paths = {
     for k, v in var.factories_config.paths : k => try(pathexpand(
@@ -98,4 +98,9 @@ resource "terraform_data" "precondition" {
       error_message = "Prefix must be set in project defaults or overrides."
     }
   }
+}
+
+data "google_billing_account" "default" {
+  count        = try(local._defaults.global.billing_account_name, null) != null ? 1 : 0
+  display_name = local._defaults.global.billing_account_name
 }

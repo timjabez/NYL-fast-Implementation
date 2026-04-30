@@ -8,7 +8,7 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "billing_account": {
+        "billing_account": { "type": "string" }, "billing_account_name": {
           "type": "string"
         },
         "organization": {
@@ -31,7 +31,7 @@
         }
       },
       "required": [
-        "billing_account",
+        
         "organization"
       ]
     },
@@ -59,7 +59,7 @@
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "billing_account": {
+            "billing_account": { "type": "string" }, "billing_account_name": {
               "type": "string"
             },
             "bucket": {
@@ -320,7 +320,7 @@
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "billing_account": {
+            "billing_account": { "type": "string" }, "billing_account_name": {
               "type": "string"
             },
             "bucket": {

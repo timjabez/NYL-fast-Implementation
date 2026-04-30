@@ -17,6 +17,7 @@
 global:
   # use `gcloud beta billing accounts list` to populate
   billing_account: <YOUR_BILLING_ID>
+  billing_account_name: "YOUR_BILLING_ACCOUNT_NAME" # REPLACE THIS WITH YOUR BILLING ACCOUNT NAME
   organization:
     # use `gcloud organizations list`` to populate
     domain: <YOUR_DOMAIN_NAME>
