@@ -26,20 +26,21 @@ iam_bindings:
   pf_org_policy_admin:
     role: roles/orgpolicy.policyAdmin
     members:
-      - $iam_principals:service_accounts/iac-0/iac-pf-rw
+      - $iam_principals:service_accounts/seed/iac-pf-rw
+      - $iam_principals:service_accounts/seed/seed-sa
     condition:
       expression: resource.matchTag('${organization.id}/context', 'project-factory')
       title: Project factory org policy admin
   pf_org_policy_viewer:
     role: roles/orgpolicy.policyViewer
     members:
-      - $iam_principals:service_accounts/iac-0/iac-pf-ro
+      - $iam_principals:service_accounts/seed/iac-pf-ro
     condition:
       expression: resource.matchTag('${organization.id}/context', 'project-factory')
       title: Project factory org policy viewer
 # authoritative IAM bindings by principal
 iam_by_principals:
-  "user:admin@<YOUR_DOMAIN_NAME>":
+  "user:admin@timjabez.altostrat.com":
     - roles/billing.admin
     - roles/logging.admin
     - roles/iam.organizationRoleAdmin
@@ -63,7 +64,7 @@ iam_by_principals:
     - roles/resourcemanager.projectCreator
     - roles/resourcemanager.tagAdmin
     - roles/iam.workforcePoolAdmin
-  $iam_principals:service_accounts/iac-0/iac-org-rw:
+  $iam_principals:service_accounts/seed/iac-org-rw:
     - roles/accesscontextmanager.policyAdmin
     - roles/cloudasset.viewer
     - roles/essentialcontacts.admin
@@ -77,7 +78,12 @@ iam_by_principals:
     - roles/resourcemanager.projectMover
     - roles/resourcemanager.tagAdmin
     - roles/resourcemanager.tagUser
-  $iam_principals:service_accounts/iac-0/iac-org-ro:
+  $iam_principals:service_accounts/seed/seed-sa:
+    - roles/resourcemanager.folderAdmin
+    - roles/resourcemanager.projectCreator
+    - roles/billing.user
+    - roles/resourcemanager.tagUser
+  $iam_principals:service_accounts/seed/iac-org-ro:
     - roles/cloudasset.viewer
     - roles/essentialcontacts.viewer
     - roles/iam.organizationRoleViewer
@@ -91,23 +97,23 @@ iam_by_principals:
     - $custom_roles:tag_viewer
 
   # uncomment for cooperative VPC-SC configurations
-  # $iam_principals:service_accounts/iac-0/iac-pf-rw:
+  # $iam_principals:service_accounts/seed/iac-pf-rw:
   #   - roles/accesscontextmanager.policyEditor
   # uncomment if you want to use Assured Workloads
-  # $iam_principals:service_accounts/iac-0/iac-pf-rw:
+  # $iam_principals:service_accounts/seed/iac-pf-rw:
   #   - roles/assuredworkloads.editor
-  $iam_principals:service_accounts/iac-0/iac-security-rw:
+  $iam_principals:service_accounts/seed/iac-security-rw:
     # uncomment for cooperative VPC-SC configurations
     # - roles/accesscontextmanager.policyEditor
     - roles/cloudasset.viewer
-  $iam_principals:service_accounts/iac-0/iac-security-ro:
+  $iam_principals:service_accounts/seed/iac-security-ro:
     # uncomment for cooperative VPC-SC configurations
     # - roles/accesscontextmanager.policyReader
     - roles/cloudasset.viewer
-  $iam_principals:service_accounts/iac-0/iac-vpcsc-rw:
+  $iam_principals:service_accounts/seed/iac-vpcsc-rw:
     - roles/accesscontextmanager.policyAdmin
     - roles/cloudasset.viewer
-  $iam_principals:service_accounts/iac-0/iac-vpcsc-ro:
+  $iam_principals:service_accounts/seed/iac-vpcsc-ro:
     - roles/accesscontextmanager.policyReader
     - roles/cloudasset.viewer
   # Uncomment if you want to use PAM.
@@ -116,33 +122,6 @@ iam_by_principals:
 data_access_logs:
   sts.googleapis.com:
     ADMIN_READ: {}
-logging:
-  sinks:
-    audit-logs:
-      destination: $log_buckets:prj-audit-logs/audit-logs
-      filter: |
-        log_id("cloudaudit.googleapis.com/activity") OR
-        log_id("cloudaudit.googleapis.com/system_event") OR
-        log_id("cloudaudit.googleapis.com/policy") OR
-        log_id("cloudaudit.googleapis.com/access_transparency")
-    splunk-export:
-      type: pubsub
-      destination: $pubsub_topics:prj-audit-logs/splunk-export-topic
-      filter: |
-        log_id("cloudaudit.googleapis.com/activity") OR
-        log_id("cloudaudit.googleapis.com/system_event") OR
-        log_id("cloudaudit.googleapis.com/policy") OR
-        log_id("cloudaudit.googleapis.com/access_transparency")
-    iam:
-      destination: $log_buckets:prj-audit-logs/iam
-      filter: |
-        protoPayload.serviceName="iamcredentials.googleapis.com" OR
-        protoPayload.serviceName="iam.googleapis.com" OR
-        protoPayload.serviceName="sts.googleapis.com"
-    vpc-sc:
-      destination: $log_buckets:prj-audit-logs/vpc-sc
-      filter: |
-        protoPayload.metadata.@type="type.googleapis.com/google.cloud.audit.VpcServiceControlAuditMetadata"
 # authoritative IAM bindings by role
 # these are internally merged with IAM by principal
 iam:
