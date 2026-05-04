@@ -16,6 +16,8 @@
 
 name: Team A
 parent: $folder_ids:teams
-# iam_by_principals:
-#   "group:team-a-admins@example.com":
-#     - roles/viewer
+iam_by_principals:
+  $iam_principals:harness-deploy:
+    - roles/bigquery.admin
+    - roles/logging.admin
+    - roles/serviceusage.serviceUsageConsumer

@@ -25,6 +25,7 @@ values:
       "roles/resourcemanager.tagUser":
         - $iam_principals:service_accounts/seed/iac-security-rw
         - $iam_principals:service_accounts/seed/iac-pf-rw
+        - $iam_principals:service_accounts/seed/seed-sa
       "roles/resourcemanager.tagViewer":
         - $iam_principals:service_accounts/seed/iac-security-ro
         - $iam_principals:service_accounts/seed/iac-pf-ro
@@ -34,6 +35,7 @@ values:
       "roles/resourcemanager.tagUser":
         - $iam_principals:service_accounts/seed/iac-security-rw
         - $iam_principals:service_accounts/seed/iac-pf-rw
+        - $iam_principals:service_accounts/seed/seed-sa
       "roles/resourcemanager.tagViewer":
         - $iam_principals:service_accounts/seed/iac-security-ro
         - $iam_principals:service_accounts/seed/iac-pf-ro

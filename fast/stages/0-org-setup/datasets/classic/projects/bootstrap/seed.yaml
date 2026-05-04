@@ -19,6 +19,8 @@ iam_by_principals:
     - roles/storage.admin
   $iam_principals:service_accounts/seed/iac-pf-rw:
     - roles/serviceusage.serviceUsageConsumer
+  $iam_principals:service_accounts/seed/seed-sa:
+    - roles/serviceusage.serviceUsageConsumer
   $iam_principals:service_accounts/seed/iac-pf-ro:
     - roles/serviceusage.serviceUsageConsumer
   $iam_principals:service_accounts/seed/iac-security-rw:
@@ -54,15 +56,13 @@ services:
   - storage.googleapis.com
   - sts.googleapis.com
 org_policies:
-  iam.workloadIdentityPoolProviders:
-    rules:
-      - allow:
-          values:
-            - https://token.actions.githubusercontent.com
-            - https://gitlab.com
-            - https://app.terraform.io
-factories_config:
-  observability: observability/seed
+  # iam.workloadIdentityPoolProviders:
+  #   rules:
+  #     - allow:
+  #         values:
+  #           - https://token.actions.githubusercontent.com
+  #           - https://gitlab.com
+  #           - https://app.terraform.io
 data_access_logs:
   storage.googleapis.com:
     DATA_READ: {}
@@ -90,3 +90,5 @@ service_accounts:
     display_name: IaC service account for project factory (read-only).
   iac-pf-rw:
     display_name: IaC service account for project factory (read-write).
+  seed-sa:
+    display_name: IaC service account for seed project factory (read-write).

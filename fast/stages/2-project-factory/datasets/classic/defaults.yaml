@@ -33,6 +33,8 @@ projects:
 # environment-specific static contexts can be defined here
 
 context:
+  iam_principals:
+    harness-deploy: serviceAccount:harness-deploy-test@genarch-464206.iam.gserviceaccount.com
 #   iam_principals:
 #     foo: group:foo@example.com
   locations:
