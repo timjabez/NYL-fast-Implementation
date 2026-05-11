@@ -1,31 +1,13 @@
 parent: $folder_ids:bootstrap
 name: seed
+auto_create_network: true
 iam_by_principals:
   $iam_principals:gcp-organization-admins:
     - roles/iam.serviceAccountTokenCreator
     - roles/iam.workloadIdentityPoolAdmin
-  $iam_principals:service_accounts/seed/iac-org-ro:
-    - roles/browser
-    - roles/cloudbuild.builds.viewer
-    - roles/iam.serviceAccountViewer
-    - roles/iam.workloadIdentityPoolViewer
-    - $custom_roles:storage_viewer
-    - roles/viewer
-  $iam_principals:service_accounts/seed/iac-org-rw:
-    - roles/cloudbuild.builds.editor
-    - roles/iam.serviceAccountAdmin
-    - roles/iam.workloadIdentityPoolAdmin
-    - roles/owner
-    - roles/storage.admin
-  $iam_principals:service_accounts/seed/iac-pf-rw:
-    - roles/serviceusage.serviceUsageConsumer
   $iam_principals:service_accounts/seed/seed-sa:
     - roles/serviceusage.serviceUsageConsumer
-  $iam_principals:service_accounts/seed/iac-pf-ro:
-    - roles/serviceusage.serviceUsageConsumer
-  $iam_principals:service_accounts/seed/iac-security-rw:
-    - roles/serviceusage.serviceUsageConsumer
-  $iam_principals:service_accounts/seed/iac-security-ro:
+  serviceAccount:harness-sa@nyl.com:
     - roles/serviceusage.serviceUsageConsumer
 services:
   - accesscontextmanager.googleapis.com
@@ -74,21 +56,8 @@ data_access_logs:
     DATA_READ: {}
     DATA_WRITE: {}
 service_accounts:
-  iac-org-ro:
-    display_name: IaC service account for org setup (read-only).
-  iac-org-rw:
-    display_name: IaC service account for org setup (read-write).
-  iac-vpcsc-ro:
-    display_name: IaC service account for VPC service controls (read-only).
-  iac-vpcsc-rw:
-    display_name: IaC service account for VPC service controls (read-write).
-  iac-security-ro:
-    display_name: IaC service account for security (read-only).
-  iac-security-rw:
-    display_name: IaC service account for security (read-write).
-  iac-pf-ro:
-    display_name: IaC service account for project factory (read-only).
-  iac-pf-rw:
-    display_name: IaC service account for project factory (read-write).
   seed-sa:
     display_name: IaC service account for seed project factory (read-write).
+    iam:
+      roles/iam.serviceAccountTokenCreator:
+        - "group:gcp-organization-admins@timjabez.altostrat.com" # TO-DO: Update this to Harness Connector SA

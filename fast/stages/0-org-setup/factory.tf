@@ -15,10 +15,6 @@
  */
 
 locals {
-  factory_billing = (
-    try(local.project_defaults.defaults.billing_account, null) != null ||
-    try(local.project_defaults.overrides.billing_account, null) != null
-  ) ? {} : { billing_account = local.defaults.billing_account }
   factory_parent = (
     try(local.project_defaults.defaults.parent, null) != null ||
     try(local.project_defaults.overrides.parent, null) != null
@@ -29,7 +25,6 @@ module "factory" {
   source = "../../../modules/project-factory"
   data_defaults = merge(
     local.project_defaults.defaults,
-    local.factory_billing,
     local.factory_parent
   )
   data_overrides = local.project_defaults.overrides
@@ -50,13 +45,7 @@ module "factory" {
         default = try(module.organization[0].id, null)
       }
     )
-    iam_principals = merge(
-      {
-        for k, v in local.org_logging_identities :
-        k => "serviceAccount:${v}" if v != null
-      },
-      local.iam_principals
-    )
+    iam_principals = local.iam_principals
     tag_values = merge(
       local.ctx.tag_values,
       local.org_tag_values
@@ -64,7 +53,6 @@ module "factory" {
   })
   factories_config = {
     basepath = var.factories_config.dataset
-    budgets  = local.factory_billing
     paths    = var.factories_config.paths
   }
 }

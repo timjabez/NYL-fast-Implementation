@@ -60,14 +60,6 @@ locals {
     gcp-security-admins     = "group:gcp-security-admins@${local.organization.domain}"
     gcp-support             = "group:gcp-support@${local.organization.domain}"
   }
-  org_logging_identities = merge(
-    module.organization[0].logging_identities.kms == null ? {} : {
-      "organization/logging/kms" = module.organization[0].logging_identities.kms
-    },
-    module.organization[0].logging_identities.logging == null ? {} : {
-      "organization/logging/sinks" = module.organization[0].logging_identities.logging
-    }
-  )
   org_tag_keys = {
     for k, v in module.organization[0].tag_keys : k => v.id
   }
@@ -77,10 +69,9 @@ locals {
 }
 
 module "organization" {
-  source           = "../../../modules/organization"
-  count            = local.organization_id != null ? 1 : 0
-  organization_id  = "organizations/${local.organization_id}"
-  logging_settings = lookup(local.organization, "logging", null)
+  source          = "../../../modules/organization"
+  count           = local.organization_id != null ? 1 : 0
+  organization_id = "organizations/${local.organization_id}"
   context = {
     condition_vars = {
       organization = {
@@ -162,9 +153,7 @@ module "organization-iam" {
   iam_by_principals_additive = lookup(
     local.organization, "iam_by_principals_additive", {}
   )
-  logging_data_access = try(local.organization.data_access_logs, {})
-  logging_sinks       = try(local.organization.logging.sinks, {})
-  pam_entitlements    = try(local.organization.pam_entitlements, {})
+  pam_entitlements = try(local.organization.pam_entitlements, {})
   tags_config = {
     force_context_ids = true
   }

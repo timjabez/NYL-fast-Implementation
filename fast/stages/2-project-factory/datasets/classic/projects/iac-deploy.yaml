@@ -1,0 +1,25 @@
+parent: folders/60091239317 # REPLACE WITH VALID FOLDER ID
+name: iac-deploy
+# perimeter_name: "accessPolicies/<POLICY_ID>/servicePerimeters/<PERIMETER_NAME>" # REPLACE WITH VALID PERIMETER OR USE $vpc_sc_perimeters:<KEY>
+
+services:
+  - compute.googleapis.com
+  - storage.googleapis.com
+  - iam.googleapis.com
+
+# iam_by_principals:
+#   "principalSet:PLACEHOLDER":
+#     - roles/secretmanager.secretAccessor
+
+# service_accounts:
+#   iac-deploy-sa:
+#     display_name: "IaC Deployment Service Account"
+#     # iam:
+#     #   roles/iam.serviceAccountTokenCreator:
+#     #     - "serviceAccount:harness-sa@nyl.com"
+#     iam_project_roles:
+#       iac-deploy:
+#         - roles/owner
+
+# tag_bindings:
+#   environment: production

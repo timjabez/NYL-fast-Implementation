@@ -20,6 +20,8 @@ projects:
   defaults:
     locations:
       storage: $locations:primary
+    # vpc_sc:
+    #   perimeter_name: "accessPolicies/<POLICY_ID>/servicePerimeters/<PERIMETER_NAME>" # REPLACE WITH VALID PERIMETER OR USE $vpc_sc_perimeters:<KEY>
   merges:
     services:
       - logging.googleapis.com

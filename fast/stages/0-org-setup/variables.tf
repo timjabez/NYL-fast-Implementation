@@ -43,11 +43,9 @@ variable "factories_config" {
   type = object({
     dataset = optional(string, "datasets/classic")
     paths = optional(object({
-      billing_accounts  = optional(string, "billing-accounts")
       cicd_workflows    = optional(string)
       defaults          = optional(string, "defaults.yaml")
       folders           = optional(string, "folders")
-      observability     = optional(string, "observability")
       organization      = optional(string, "organization")
       project_templates = optional(string, "templates")
       projects          = optional(string, "projects")

@@ -27,8 +27,6 @@ locals {
     iam_principals = merge(local.iam_principals, local._ctx.iam_principals)
   })
   defaults = {
-    billing_account = try(data.google_billing_account.default[0].id, local._defaults.global.billing_account, null)
-    observability   = try(local._defaults.observability, null)
     organization = (
       try(local._defaults.global.organization.id, null) == null
       ? null
@@ -79,10 +77,6 @@ locals {
 resource "terraform_data" "precondition" {
   lifecycle {
     precondition {
-      condition     = try(local.defaults.billing_account, null) != null
-      error_message = "No billing account set in global defaults."
-    }
-    precondition {
       condition = (
         local.organization_id != null ||
         try(local.project_defaults.defaults.parent, null) != null ||
@@ -98,9 +92,4 @@ resource "terraform_data" "precondition" {
       error_message = "Prefix must be set in project defaults or overrides."
     }
   }
-}
-
-data "google_billing_account" "default" {
-  count        = try(local._defaults.global.billing_account_name, null) != null ? 1 : 0
-  display_name = local._defaults.global.billing_account_name
 }
